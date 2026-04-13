@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>WebSIG | Mapeamento</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0; right: 0; 
+        bottom: 0; left: 0;
+        width:100%;
+        height:100%; 
+      }
+    </style>
+  </head>
+  <body>
+  <style>
+    #menu {
+        position: absolute;
+		right: 45px;
+		top: 31px;
+        background: #fff;
+        padding: 4px;
+        font-family: 'Open Sans', sans-serif;
+		opacity: 0.85;
+		padding: 5px 15px;
+		border: none;
+		z-index:1;
+		border-radius: 3px;
+    }
+.topo {
+  background-color: #fff;
+  position: fixed;
+  padding: 4px;
+  opacity: 0.85;
+  top:1px;
+  right: 11px;
+  left: 6px;
+  max-height: 20px;
+  max-weight: 80%;
+  z-index:1;
+  border-radius: 3px;
+}
+
+.titulo-principal {
+  font-size: calc(12% + 0.5vw + 1vh);
+  font-size: "Open Sans Condensed", "Arial", sans-serif;
+  text-align: center;
+  margin: 0 auto;
+}
+</style>
+  <style>
+  .mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    overflow: auto;
+    opacity: 0.9;
+	position: sticky;
+  }
+
+  #mySidebar {
+    background: #fff;
+    position: relative;
+    opacity: 0.85;
+    z-index: 1;
+    top: 78px;
+    left: 7px;
+    border-radius: 3px;
+    height: 100%;
+    width: 200px;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 5px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+    border: 0;
+    font-family: 'Open Sans', sans-serif;
+  }
+  
+  #mySidebar a {
+    font-size: 13px;
+    color: #404040;
+    display: block;
+    margin: 0;
+    padding: 10px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    text-align: center;
+    transition: 0.3s;
+  }
+  
+  #mySidebar a:last-child {
+    border: none;
+  }
+  
+  #mySidebar a:hover {
+    background-color: #f8f8f8;
+    color: #404040;
+  }
+  
+  #mySidebar a.active {
+    background-color: #2F4F4F;
+    color: #ffffff;
+  }
+  
+  #mySidebar a.active:hover {
+    background: #708090;
+  }
+
+  /* The button used to open the sidebar */
+  .openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #fff;
+    opacity: 0.85;
+    color: black;
+    padding: 10px 15px;
+    border: none;
+    position:absolute; 
+    width: 50px;
+    top:31px; 
+    left:7px; 
+    z-index:1;
+    border-radius: 3px;
+  }
+
+  .openbtn:hover {
+    background-color: #f8f8f8;
+  }
+
+  .sidebar, .submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .sidebar li:hover .submenu,
+  .submenu-opened {
+    display: block;
+    max-height: 500px !important;
+	  line-height: 1;
+  }
+
+  .submenu a {
+    background-color: #999;
+  }
+
+  /* hover behaviour for links inside .submenu */
+  .submenu a:hover {
+    background-color: #666;
+  }
+
+  /* this is the initial state of all submenus.
+    we set it to max-height: 0, and hide the overflowed content.
+  */
+  .submenu {
+    overflow: hidden;
+    max-height: 0;
+    -webkit-transition: all 0.5s ease-out;
+  }
+
+
+  /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+  @media screen and (max-height: 450px) {
+    .sidebar { padding-top: 15px; }
+    .sidebar a { font-size: 18px; }
+  }
+  #fly {
+    font-size: 20px;
+	font-weight: bold;
+    cursor: pointer;
+    background-color: #fff;
+    color: black;
+    padding: 2px 2px;
+    border: none;
+    position: absolute; 
+    width: 32px;
+    top:65px; 
+    right:9px; 
+    z-index:1;
+    border-radius: 3px;
+	opacity: 0.85;
+  }
+  
+  #fly:hover{
+  background-color: #f8f8f8;
+  }
+
+  .img {
+  position: absolute;
+  max-height: 12%;
+  bottom: 3%;
+  right: 0.3%;
+}
+  .mapboxgl-ctrl-top-right {
+  cursor: pointer;
+  top: 21px;
+  right: 1px;
+  opacity: 0.85;
+}
+
+</style>
+ 
+	<nav>
+    <div id='mySidebar' class='sidebar'>
+    </div>
+  </nav>
+
+	<nav id='main'>
+    <button class='openbtn' id='openbtn'>&#9776;</button>
+  </nav>
+
+  <div id='map'></div>
+
+  <div id="menu">
+    <input
+        id="ckgdkqtp8693x19nwxt2ckqkw"
+        type="radio"
+        name="rtoggle"
+        value="streets"
+        checked="checked"
+    />
+    <label for="ckgdkqtp8693x19nwxt2ckqkw">Vetores</label>
+    <input id="ckgdkzfm02q9y19pgq780sj3d" type="radio" name="rtoggle" value="satellite" />
+    <label for="ckgdkzfm02q9y19pgq780sj3d">Satélite</label>
+  </div>
+
+  <br />
+  <button id="fly">&#9737;</button>
+  
+  <div class='image'>
+    <img class="img" src="https://docs.google.com/uc?id=11ukMFjhIJrPs3DIJXIRIsypJgAgERzqP">
+	</div>
+  
+  <header class="topo">
+  <h1 class="titulo-principal">Mapeamento de conflitos ambientais envolvendo pescadores(as) artesanais</h1>
+</header>
+
+  <script>
+    mapboxgl.accessToken = "pk.eyJ1IjoiY2F2aTg5IiwiYSI6ImNrOXE1M3YxMTBneWgzbG8zeDhobTU3OHQifQ.xnmjboP7HhUm-Shnf7gt2Q"; // replace this with your access token
+
+    var map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/cavi89/ckgdkqtp8693x19nwxt2ckqkw", // replace this with your style URL
+    });
+
+    function fit() {
+      //fit gl map to a geojson file bounds
+      try {
+        map.fitBounds(geojsonExtent("Area de estudo"));
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    var layerList = document.getElementById('menu');
+    var inputs = layerList.getElementsByTagName('input');
+
+    function switchLayer(layer) {
+      console.log('switch')
+      var layerId = layer.target.id;
+      map.setStyle('mapbox://styles/cavi89/' + layerId);
+
+      document.getElementById('mySidebar')
+        .querySelectorAll('a')
+        .forEach(function (el) {
+          el.className = "";
+        });
+
+      for (var i in submenus) {
+        for (let k in submenus[i]) {
+          submenus[i][k] = false;
+        }
+      }
+
+      document.querySelectorAll('.submenu')
+        .forEach(function (el) {
+          el.classList.remove('submenu-opened');
+        });
+    }
+
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].onclick = switchLayer;
+    }
+
+	  document.getElementById('fly').addEventListener('click', function() {
+      //////////////
+      map.flyTo({
+        center: [-43.009, -22.090],
+        zoom: 7.3,
+        essential: true 
+      });
+    });
+
+    map.addControl(new mapboxgl.FullscreenControl());
+
+    // PopUps ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    map.on("click", function (e) {
+      var features = map.queryRenderedFeatures(e.point, {
+        layers: ["Conflitos ambientais"], // replace this with the name of the layer
+      });
+
+      if (!features.length) {
+        return;
+      }
+
+      var feature = features[0];
+
+      var popup = new mapboxgl.Popup({ offset: [0, -15] })
+        .setLngLat(feature.geometry.coordinates)
+        .setHTML(
+          "<h3>" +
+            feature.properties.NOME +
+            "</h3><p><b>Principal atividade econômica:</b> " +
+            feature.properties.PRINCIPAL +
+            "</p></p><b>Principal política ambiental:</b> " +
+            feature.properties.PRINCIPA_1 +
+			"</p></p><b>Atores sociais:</b> " +
+			feature.properties.ATORES_1 +
+			"</p></p><a target= _blank href= "+
+			encodeURI(feature.properties.URL) +"'><button onclick =>FICHA TÉCNICA</button></a></p>"
+        )
+        .addTo(map);
+    });
+    // Change the cursor to a pointer when the mouse is over the states layer.
+    map.on("mouseenter", "Conflitos ambientais", function () {
+      //trocar layer
+      map.getCanvas().style.cursor = "pointer";
+    });
+
+    // Change it back to a pointer when it leaves.
+    map.on("mouseleave", "Conflitos ambientais", function () {
+      //trocar layer
+      map.getCanvas().style.cursor = "";
+    });
+	
+	map.on("click", function (e) {
+      var features = map.queryRenderedFeatures(e.point, {
+        layers: ["Mun pescadores"], // replace this with the name of the layer
+      });
+
+      if (!features.length) {
+        return;
+      }
+
+      var feature = features[0];
+
+      var popup = new mapboxgl.Popup({ offset: [0, -15] })
+        .setLngLat(feature.geometry.coordinates)
+        .setHTML(
+          "<p><b>Município:</b> " +
+            feature.properties.NOME +
+			"</p></p><b>Pescadores artesanais (2019):</b> " +
+            feature.properties.Pes_Art_19 +
+            "</p>"
+        )
+        .addTo(map);
+    });
+    // Change the cursor to a pointer when the mouse is over the states layer.
+    map.on("mouseenter", "Mun pescadores", function () {
+      //trocar layer
+      map.getCanvas().style.cursor = "pointer";
+    });
+
+    // Change it back to a pointer when it leaves.
+    map.on("mouseleave", "Mun pescadores", function () {
+      //trocar layer
+      map.getCanvas().style.cursor = "";
+    });
+	map.on("click", function (e) {
+      var features = map.queryRenderedFeatures(e.point, {
+        layers: ["Entidades pesca"], // replace this with the name of the layer
+      });
+
+      if (!features.length) {
+        return;
+      }
+
+      var feature = features[0];
+
+      var popup = new mapboxgl.Popup({ offset: [0, -15] })
+        .setLngLat(feature.geometry.coordinates)
+        .setHTML(
+          "<p><b>Entidade de pesca:</b> " +
+            feature.properties.Nome_da_en +
+            "</p>"
+        )
+        .addTo(map);
+    });
+    // Change the cursor to a pointer when the mouse is over the states layer.
+    map.on("mouseenter", "Entidades pesca", function () {
+      //trocar layer
+      map.getCanvas().style.cursor = "pointer";
+    });
+
+    // Change it back to a pointer when it leaves.
+    map.on("mouseleave", "Entidades pesca", function () {
+      //trocar layer
+      map.getCanvas().style.cursor = "";
+    });
+
+    // PopUps ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    map.on("load", function () {
+      // When a click event occurs on a feature in the states layer, open a popup at the
+      // location of the click, with description HTML from its properties.
+      map.on("click", "UCs Federais", function (e) {
+        new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(
+            "<h3>" +
+              e.features[0].properties.nome_uc +
+              "</h3>"
+          )
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the states layer.
+      map.on("mouseenter", "UCs Federais", function () {
+        map.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      map.on("mouseleave", "UCs Federais", function () {
+        map.getCanvas().style.cursor = "";
+      });
+    });
+	map.on("load", function () {
+      // When a click event occurs on a feature in the states layer, open a popup at the
+      // location of the click, with description HTML from its properties.
+      map.on("click", "UCs Estaduais", function (e) {
+        new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(
+            "<h3>" +
+              e.features[0].properties.nome +
+              "</h3>"
+          )
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the states layer.
+      map.on("mouseenter", "UCs Estaduais", function () {
+        map.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      map.on("mouseleave", "UCs Estaduais", function () {
+        map.getCanvas().style.cursor = "";
+      });
+    });
+
+    map.on("load", function () {
+      // When a click event occurs on a feature in the states layer, open a popup at the
+      // location of the click, with description HTML from its properties.
+      map.on("click", "Area de estudo", function (e) {
+        new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(
+          "<h3>" +
+            e.features[0].properties.NOME +
+            "</h3><p><b>Região:</b> " +
+            e.features[0].properties.Regiao_RJ +
+            "</p></p><b>População estimada (Ano de 2019, IBGE):</b> " +
+            e.features[0].properties.Pop_Est_19 +
+            "</p>"
+        )
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the states layer.
+      map.on("mouseenter", "Area de estudo", function () {
+        map.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      map.on("mouseleave", "Area de estudo", function () {
+        map.getCanvas().style.cursor = "";
+      });
+    });
+
+    // Vinculador  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // enumerate ids of the layers
+    var toggleableLayerIds = [
+      {
+        label: "Área de estudo",
+        layer: "Area de estudo"
+      },
+	  {
+        label: "RJ – Limite estadual",
+        layer: "Limite estadual"
+      },
+      {
+        label: "Conflitos ambientais",
+        layer: "Conflitos ambientais"
+      },
+	        {
+        label: "Concentração espacial de conflitos ambientais",
+        layer: "Conflitos ambientais MC"
+      },
+	  	        {
+        label: "Entidades de pesca",
+        layer: "Entidades pesca"
+      },
+	  	  	        {
+        label: "Concentração espacial de entidades de pesca",
+        layer: "Entidades pesca MC"
+      },
+	        {
+        label: "Pescadores artesanais",
+        layer: "Mun pescadores"
+      },
+      {
+        label: "UCs Federais",
+        layer: "UCs Federais"
+      },
+      {
+        label: "UCs Estaduais",
+        layer: "UCs Estaduais"
+      },
+      {
+        label: "Áreas urbanizadas",
+        layer: "Areas urbanizadas"
+      }
+    ];
+
+    var submenus = {};
+
+    function pushMenuItem(item, submenu) {
+      var link = document.createElement("a");
+      link.href = "#";
+      link.className = "disable";
+      link.textContent = item.label;
+      link.layer = item.layer;
+      link.submenu = submenu;
+
+      if (submenu && !submenus[submenu.id]) {
+        submenus[submenu.id] = {};
+      }
+
+      link.onclick = function (e) {
+        var clickedLayer = this.layer;
+        var submenu = this.submenu;
+        e.preventDefault();
+        e.stopPropagation();
+
+        var visibility = map.getLayoutProperty(clickedLayer, "visibility");
+
+        // toggle layer visibility by changing the layout object's visibility property
+        if (visibility === "visible") {
+          map.setLayoutProperty(clickedLayer, "visibility", "none");
+          this.className = "";
+
+          if (submenu) {
+            delete submenus[submenu.id][clickedLayer];
+          }
+        } else {
+          this.className = "active";
+          map.setLayoutProperty(clickedLayer, "visibility", "visible");
+
+          if (submenu) {
+            submenus[submenu.id][clickedLayer] = true;
+          }
+        }
+      };
+
+      if (submenu) {
+        let submenuEl = document.getElementById(submenu.id);
+
+        if (!submenuEl) {
+          var li = document.createElement('li');
+          li.innerHTML = "<a href='#'>"+ submenu.label +"</a><ul class='submenu' id='"+ submenu.id +"'></ul>"
+
+          document.getElementById('mySidebar')
+            .appendChild(li);
+
+          submenuEl = document.getElementById(submenu.id)
+        }
+
+        submenuEl
+          .appendChild(
+            document.createElement('li')
+              .appendChild(link)
+          );
+      } else {
+        document.getElementById('mySidebar')
+          .appendChild(link);
+      }
+    }
+
+    // set up the corresponding toggle button for each layer
+    for (var i = 0; i < toggleableLayerIds.length; i++) {
+      var item = toggleableLayerIds[i];
+
+      if (item.hasOwnProperty('items')) {
+        for (let subItem of item.items) {
+          pushMenuItem(subItem, item);
+        }
+      } else {
+        pushMenuItem(item);
+      }
+    }
+
+    document.querySelectorAll('.sidebar li')
+      .forEach(function (el) {
+        el.addEventListener('mouseleave', function(e) {
+          
+          var submenu = e.target.getElementsByTagName('ul')[0];
+          var submenuId = submenu.getAttribute('id');
+
+          var keepVisible = Object.keys(submenus[submenuId]).length > 0;
+
+          if (keepVisible) {
+            submenu.classList.add('submenu-opened');
+          } else {
+            submenu.classList.remove('submenu-opened');
+          }
+        })
+      });
+
+    document.querySelectorAll('.sidebar li')
+      .forEach(function(el) {
+        el.addEventListener('mouseenter', function(e) {
+          var submenu = e.target.getElementsByTagName('ul')[0];
+          submenu.classList.add('submenu-opened');
+        })
+      });
+
+    document.getElementById("openbtn").onclick = close;
+
+    document.getElementById("openbtn").onclick = open;
+    /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
+    function close() {
+      document.getElementById("openbtn").onclick = open;
+      document.getElementById("mySidebar").style.width = "200px";
+      document.getElementById("main").style.marginLeft = "200px";
+    }
+
+    /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
+    function open() {
+      document.getElementById("openbtn").onclick = close;
+      document.getElementById("mySidebar").style.width = "0";
+      document.getElementById("main").style.marginLeft = "0";
+    }
+    </script>
+  </body>
+</html>
